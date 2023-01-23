@@ -20,13 +20,18 @@ import androidx.compose.ui.text.input.VisualTransformation
 import java.math.BigDecimal
 
 /**
- * @param maxValue max value. if null or default, it have no limit. it would better be number format
+ * @param initAmount initial displayed amount. it could be larger than [maxValue] or longer than [maxLength]
+ * @param maxValue max value. if null or by default, it have no limit
+ * @param maxLength max length. if null or by default, it have no limit
  * @param onTextChanged callback of displayed text
  * @param onValueChanged callback of currency value
  * @param showUnit show currency unit or not
  * @param unit currency unit. It will obey current locale's currency unit for default
+ * @param rearUnit display unit to end of currency if true else start of currency
  * @param textStyle text style for displayed text
- * @param editable editable or not
+ * @param editable controls the editable state of the [CurrencyField]. When false, the text field can not be modified, however, a user can focus it and copy text from it. Read-only text fields are usually used to display pre-filled forms that user can not edit
+ * @param enabled controls the enabled state of the [CurrencyField]. When false, the text field will be neither editable nor focusable, the input of the text field will not be selectable
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s for this TextField. You can create and pass in your own remembered [MutableInteractionSource] if you want to observe [Interaction]s and customize the appearance / behavior of this TextField in different [Interaction]s.
  */
 @Composable
 fun CurrencyField(
