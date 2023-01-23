@@ -1,9 +1,10 @@
 package com.mangbaam.library
 
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,8 +39,10 @@ fun CurrencyField(
     showUnit: Boolean = true,
     unit: String = "원",
     rearUnit: Boolean = true,
-    textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
-    editable: Boolean = true
+    textStyle: TextStyle = LocalTextStyle.current,
+    editable: Boolean = true,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     var amount by remember { mutableStateOf(initAmount) }
 
@@ -63,12 +66,14 @@ fun CurrencyField(
         },
         visualTransformation = CurrencyVisualTransformation(unit, showUnit, rearUnit),
         modifier = Modifier
-            .wrapContentHeight()
+            .wrapContentSize()
             .then(modifier),
         readOnly = editable.not(),
+        enabled = enabled,
         singleLine = true,
         textStyle = textStyle,
-        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+        interactionSource = interactionSource
     )
 }
 
