@@ -16,6 +16,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import java.math.BigDecimal
 
 /**
  * @param maxValue max value. if null or default, it have no limit. it would better be number format
@@ -30,7 +31,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 fun CurrencyField(
     modifier: Modifier = Modifier,
     initAmount: String = "0",
-    maxValue: String? = null,
+    maxValue: BigDecimal? = null,
     maxLength: Int? = null,
     onTextChanged: (String) -> Unit = {},
     onValueChanged: (String) -> Unit = {},
@@ -53,8 +54,7 @@ fun CurrencyField(
             maxLength?.let { maxLength ->
                 if (inputText.toString().length > maxLength) return@BasicTextField
             }
-            maxValue?.let {
-                val max = maxValue.toBigDecimalOrZero()
+            maxValue?.let { max ->
                 if (inputText > max) return@BasicTextField
             }
             amount = inputText.toString()
