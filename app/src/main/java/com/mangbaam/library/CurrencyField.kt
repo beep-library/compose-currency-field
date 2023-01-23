@@ -120,9 +120,9 @@ class CurrencyVisualTransformation(
 
 fun visualText(
     amount: String,
-    showUnit: Boolean = true,
-    unit: String = "원",
-    rearUnit: Boolean = true,
+    showUnit: Boolean,
+    unit: String,
+    rearUnit: Boolean,
 ): String {
     val sb = StringBuilder()
     if (showUnit && rearUnit.not()) {
