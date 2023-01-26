@@ -62,7 +62,7 @@ fun MainScreen() {
                 .padding(16.dp)
                 .background(Color.LightGray)
                 .padding(30.dp),
-            initAmount = "300000",
+            initAmount = BigDecimal("300000"),
             textStyle = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.End),
             onTextChanged = {
                 Log.d(MainActivity.TAG, "onTextChanged: $it")
@@ -87,7 +87,7 @@ fun InfoText(text: String) {
     )
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun MainScreenPreview() {
     CurrencyFieldTheme {

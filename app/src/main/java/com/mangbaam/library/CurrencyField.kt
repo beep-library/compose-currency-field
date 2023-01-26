@@ -1,26 +1,37 @@
 package com.mangbaam.library
 
+import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.mangbaam.library.ui.theme.CurrencyFieldTheme
 import java.math.BigDecimal
 
 /**
- * @param initAmount initial displayed amount. it could be larger than [maxValue] or longer than [maxLength]
+ * @param initAmount initial displayed amount. if this value is larger than [maxValue] or longer than [maxLength], [CurrencyField] will display "0"
  * @param maxValue max value. if null or by default, it have no limit
  * @param maxLength max length. if null or by default, it have no limit
  * @param onTextChanged callback of displayed text
@@ -36,7 +47,7 @@ import java.math.BigDecimal
 @Composable
 fun CurrencyField(
     modifier: Modifier = Modifier,
-    initAmount: String = "0",
+    initAmount: BigDecimal = BigDecimal.ZERO,
     maxValue: BigDecimal? = null,
     maxLength: Int? = null,
     onTextChanged: (String) -> Unit = {},
@@ -49,7 +60,15 @@ fun CurrencyField(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
-    var amount by remember { mutableStateOf(initAmount) }
+    val availInitAmount = if (
+        maxValue != null && initAmount > maxValue ||
+        maxLength != null && initAmount.toString().length > maxLength
+    ) {
+        "0"
+    } else {
+        initAmount.toString()
+    }
+    var amount by remember { mutableStateOf(availInitAmount) }
 
     BasicTextField(
         value = amount,
@@ -145,4 +164,28 @@ fun visualText(
         sb.append(unit)
     }
     return sb.toString()
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CurrencyFieldPreview() {
+    CurrencyFieldTheme {
+        CurrencyField(
+            modifier = Modifier
+                .padding(10.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(Color.LightGray)
+                .padding(30.dp),
+            initAmount = BigDecimal("300000"),
+            textStyle = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.End),
+            onTextChanged = {
+                Log.d(MainActivity.TAG, "onTextChanged: $it")
+            }, onValueChanged = {
+                Log.d(MainActivity.TAG, "onValueChanged: $it")
+            },
+            rearUnit = true,
+            maxValue = BigDecimal("1000"),
+            maxLength = 10
+        )
+    }
 }
