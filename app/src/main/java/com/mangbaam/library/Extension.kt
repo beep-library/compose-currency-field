@@ -1,6 +1,10 @@
 package com.mangbaam.library
 
 import java.math.BigDecimal
+import java.text.NumberFormat
+
+val symbol
+    get() = NumberFormat.getCurrencyInstance().currency?.symbol ?: "원"
 
 /**
  * filtered string with `.` and digit. It could be empty string

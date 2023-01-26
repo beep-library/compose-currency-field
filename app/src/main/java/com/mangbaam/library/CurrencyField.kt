@@ -53,7 +53,7 @@ fun CurrencyField(
     onTextChanged: (String) -> Unit = {},
     onValueChanged: (Long) -> Unit = {},
     showUnit: Boolean = true,
-    unit: String = "원",
+    unit: String = symbol,
     rearUnit: Boolean = true,
     textStyle: TextStyle = LocalTextStyle.current,
     editable: Boolean = true,
@@ -65,19 +65,19 @@ fun CurrencyField(
     }
     val maxLengthOfLong = Long.MAX_VALUE.toString().length
     CurrencyField(
-        modifier,
-        BigDecimal(initAmount),
-        maxValue?.let { BigDecimal(minOf(it, Long.MAX_VALUE)) } ?: BigDecimal(Long.MAX_VALUE),
-        maxLength?.let { minOf(it, maxLengthOfLong - 1) } ?: (maxLengthOfLong - 1),
-        onTextChanged,
-        bigDecimalOnValueChangedHandler,
-        showUnit,
-        unit,
-        rearUnit,
-        textStyle,
-        editable,
-        enabled,
-        interactionSource
+        modifier = modifier,
+        initAmount = BigDecimal(initAmount),
+        maxValue = maxValue?.let { BigDecimal(minOf(it, Long.MAX_VALUE)) } ?: BigDecimal(Long.MAX_VALUE),
+        maxLength = maxLength?.let { minOf(it, maxLengthOfLong - 1) } ?: (maxLengthOfLong - 1),
+        onTextChanged = onTextChanged,
+        onValueChanged = bigDecimalOnValueChangedHandler,
+        showUnit = showUnit,
+        unit = unit,
+        rearUnit = rearUnit,
+        textStyle = textStyle,
+        editable = editable,
+        enabled = enabled,
+        interactionSource = interactionSource
     )
 }
 
@@ -104,7 +104,7 @@ fun CurrencyField(
     onTextChanged: (String) -> Unit = {},
     onValueChanged: (BigDecimal) -> Unit = {},
     showUnit: Boolean = true,
-    unit: String = "원",
+    unit: String = symbol,
     rearUnit: Boolean = true,
     textStyle: TextStyle = LocalTextStyle.current,
     editable: Boolean = true,
