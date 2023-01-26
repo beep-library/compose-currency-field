@@ -32,6 +32,59 @@ import java.math.BigDecimal
 
 /**
  * @param initAmount initial displayed amount. if this value is larger than [maxValue] or longer than [maxLength], [CurrencyField] will display "0"
+ * @param maxValue max value. if null or by default, it have [Int]'s max value. This could not be larger than [Int]'s max value
+ * @param maxLength max length. if null or by default, it have [Int]'s max length - 1. This could not be longer than [Int]'s max length - 1
+ * @param onTextChanged callback of displayed text
+ * @param onValueChanged callback of currency value
+ * @param showSymbol show currency symbol or not
+ * @param symbol currency symbol. It will obey current locale's currency symbol for default
+ * @param rearSymbol display symbol to end of currency if true else start of currency
+ * @param textStyle text style for displayed text
+ * @param editable controls the editable state of the [CurrencyField]. When false, the text field can not be modified, however, a user can focus it and copy text from it. Read-only text fields are usually used to display pre-filled forms that user can not edit
+ * @param enabled controls the enabled state of the [CurrencyField]. When false, the text field will be neither editable nor focusable, the input of the text field will not be selectable
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s for this TextField. You can create and pass in your own remembered [MutableInteractionSource] if you want to observe [Interaction]s and customize the appearance / behavior of this TextField in different [Interaction]s.
+ */
+@Composable
+fun CurrencyField(
+    modifier: Modifier = Modifier,
+    initAmount: Int = 0,
+    maxValue: Int? = null,
+    maxLength: Int? = null,
+    onTextChanged: (String) -> Unit = {},
+    onValueChanged: (Int) -> Unit = {},
+    showSymbol: Boolean = true,
+    symbol: String = currencySymbol,
+    rearSymbol: Boolean = true,
+    textStyle: TextStyle = LocalTextStyle.current,
+    editable: Boolean = true,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+) {
+    val bigDecimalOnValueChangedHandler = { value: BigDecimal ->
+        onValueChanged(value.toInt())
+    }
+    val maxLengthOfInt = Int.MAX_VALUE.toString().length
+
+    CurrencyField(
+        modifier = modifier,
+        initAmount = BigDecimal(initAmount),
+        maxValue = maxValue?.let { BigDecimal(minOf(it, Int.MAX_VALUE)) }
+            ?: BigDecimal(Int.MAX_VALUE),
+        maxLength = maxLength?.let { minOf(it, maxLengthOfInt - 1) } ?: (maxLengthOfInt - 1),
+        onTextChanged = onTextChanged,
+        onValueChanged = bigDecimalOnValueChangedHandler,
+        showSymbol = showSymbol,
+        symbol = symbol,
+        rearSymbol = rearSymbol,
+        textStyle = textStyle,
+        editable = editable,
+        enabled = enabled,
+        interactionSource = interactionSource
+    )
+}
+
+/**
+ * @param initAmount initial displayed amount. if this value is larger than [maxValue] or longer than [maxLength], [CurrencyField] will display "0"
  * @param maxValue max value. if null or by default, it have [Long]'s max value. This could not be larger than [Long]'s max value
  * @param maxLength max length. if null or by default, it have [Long]'s max length - 1. This could not be longer than [Long]'s max length - 1
  * @param onTextChanged callback of displayed text
@@ -64,6 +117,7 @@ fun CurrencyField(
         onValueChanged(value.toLong())
     }
     val maxLengthOfLong = Long.MAX_VALUE.toString().length
+
     CurrencyField(
         modifier = modifier,
         initAmount = BigDecimal(initAmount),

@@ -49,8 +49,9 @@ fun MainScreen() {
     var displayed by remember {
         mutableStateOf("")
     }
+    val initValue = 100
     var amount by remember {
-        mutableStateOf("100")
+        mutableStateOf(initValue.toString())
     }
     Column {
         InfoText(text = "표시된 값: $displayed")
@@ -61,7 +62,7 @@ fun MainScreen() {
                 .padding(16.dp)
                 .background(Color.LightGray)
                 .padding(30.dp),
-            initAmount = 1000,
+            initAmount = initValue,
             textStyle = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.End),
             onTextChanged = {
                 Log.d(MainActivity.TAG, "onTextChanged: $it")
