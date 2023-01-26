@@ -70,7 +70,7 @@ fun MainScreen() {
                 Log.d(MainActivity.TAG, "onValueChanged: $it")
                 amount = it.toString()
             },
-            rearUnit = true,
+            rearSymbol = true,
             maxValue = null,
             maxLength = null
         )

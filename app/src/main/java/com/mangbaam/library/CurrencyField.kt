@@ -36,9 +36,9 @@ import java.math.BigDecimal
  * @param maxLength max length. if null or by default, it have [Long]'s max length - 1. This could not be longer than [Long]'s max length - 1
  * @param onTextChanged callback of displayed text
  * @param onValueChanged callback of currency value
- * @param showUnit show currency unit or not
- * @param unit currency unit. It will obey current locale's currency unit for default
- * @param rearUnit display unit to end of currency if true else start of currency
+ * @param showSymbol show currency symbol or not
+ * @param symbol currency symbol. It will obey current locale's currency symbol for default
+ * @param rearSymbol display symbol to end of currency if true else start of currency
  * @param textStyle text style for displayed text
  * @param editable controls the editable state of the [CurrencyField]. When false, the text field can not be modified, however, a user can focus it and copy text from it. Read-only text fields are usually used to display pre-filled forms that user can not edit
  * @param enabled controls the enabled state of the [CurrencyField]. When false, the text field will be neither editable nor focusable, the input of the text field will not be selectable
@@ -52,9 +52,9 @@ fun CurrencyField(
     maxLength: Int? = null,
     onTextChanged: (String) -> Unit = {},
     onValueChanged: (Long) -> Unit = {},
-    showUnit: Boolean = true,
-    unit: String = symbol,
-    rearUnit: Boolean = true,
+    showSymbol: Boolean = true,
+    symbol: String = currencySymbol,
+    rearSymbol: Boolean = true,
     textStyle: TextStyle = LocalTextStyle.current,
     editable: Boolean = true,
     enabled: Boolean = true,
@@ -67,13 +67,14 @@ fun CurrencyField(
     CurrencyField(
         modifier = modifier,
         initAmount = BigDecimal(initAmount),
-        maxValue = maxValue?.let { BigDecimal(minOf(it, Long.MAX_VALUE)) } ?: BigDecimal(Long.MAX_VALUE),
+        maxValue = maxValue?.let { BigDecimal(minOf(it, Long.MAX_VALUE)) }
+            ?: BigDecimal(Long.MAX_VALUE),
         maxLength = maxLength?.let { minOf(it, maxLengthOfLong - 1) } ?: (maxLengthOfLong - 1),
         onTextChanged = onTextChanged,
         onValueChanged = bigDecimalOnValueChangedHandler,
-        showUnit = showUnit,
-        unit = unit,
-        rearUnit = rearUnit,
+        showSymbol = showSymbol,
+        symbol = symbol,
+        rearSymbol = rearSymbol,
         textStyle = textStyle,
         editable = editable,
         enabled = enabled,
@@ -87,9 +88,9 @@ fun CurrencyField(
  * @param maxLength max length. if null or by default, it have no limit
  * @param onTextChanged callback of displayed text
  * @param onValueChanged callback of currency value
- * @param showUnit show currency unit or not
- * @param unit currency unit. It will obey current locale's currency unit for default
- * @param rearUnit display unit to end of currency if true else start of currency
+ * @param showSymbol show currency symbol or not
+ * @param symbol currency symbol. It will obey current locale's currency symbol for default
+ * @param rearSymbol display symbol to end of currency if true else start of currency
  * @param textStyle text style for displayed text
  * @param editable controls the editable state of the [CurrencyField]. When false, the text field can not be modified, however, a user can focus it and copy text from it. Read-only text fields are usually used to display pre-filled forms that user can not edit
  * @param enabled controls the enabled state of the [CurrencyField]. When false, the text field will be neither editable nor focusable, the input of the text field will not be selectable
@@ -103,9 +104,9 @@ fun CurrencyField(
     maxLength: Int? = null,
     onTextChanged: (String) -> Unit = {},
     onValueChanged: (BigDecimal) -> Unit = {},
-    showUnit: Boolean = true,
-    unit: String = symbol,
-    rearUnit: Boolean = true,
+    showSymbol: Boolean = true,
+    symbol: String = currencySymbol,
+    rearSymbol: Boolean = true,
     textStyle: TextStyle = LocalTextStyle.current,
     editable: Boolean = true,
     enabled: Boolean = true,
@@ -137,9 +138,9 @@ fun CurrencyField(
             }
             amount = inputText.toString()
             onValueChanged(BigDecimal(amount.toNumberStringOrDefault("0")))
-            onTextChanged(visualText(amount, showUnit, unit, rearUnit))
+            onTextChanged(visualText(amount, showSymbol, symbol, rearSymbol))
         },
-        visualTransformation = CurrencyVisualTransformation(unit, showUnit, rearUnit),
+        visualTransformation = CurrencyVisualTransformation(symbol, showSymbol, rearSymbol),
         modifier = Modifier
             .wrapContentSize()
             .then(modifier),
@@ -153,15 +154,20 @@ fun CurrencyField(
 }
 
 class CurrencyVisualTransformation(
-    private val unit: String,
-    private val showUnit: Boolean,
-    private val rearUnit: Boolean
+    private val symbol: String,
+    private val showSymbol: Boolean,
+    private val rearSymbol: Boolean
 ) : VisualTransformation {
 
     override fun filter(text: AnnotatedString): TransformedText {
         val currencyFormat = text.text.toFormattedNumberString(CHUNK_SIZE)
         return TransformedText(
-            text = AnnotatedString(visualText(text.text, showUnit, unit, rearUnit)),
+            text = AnnotatedString(
+                visualText(
+                    text.text, showSymbol,
+                    symbol, rearSymbol
+                )
+            ),
             offsetMapping = object : OffsetMapping {
                 override fun originalToTransformed(offset: Int): Int {
                     val rightLength = text.lastIndex - offset
@@ -169,8 +175,8 @@ class CurrencyVisualTransformation(
                     val transformedIndex = currencyFormat.lastIndex - (rightLength + commasAtRight)
 
                     return transformedIndex.coerceIn(0..currencyFormat.length).let {
-                        if (showUnit && rearUnit.not()) {
-                            it + unit.length
+                        if (showSymbol && rearSymbol.not()) {
+                            it + symbol.length
                         } else {
                             it
                         }
@@ -182,9 +188,9 @@ class CurrencyVisualTransformation(
                     val rightOffset = currencyFormat.lastIndex - offset
                     val commasAtRight = rightOffset / (CHUNK_SIZE + 1)
 
-                    return if (showUnit && rearUnit.not()) {
-                        (offset - (commas - commasAtRight) - unit.length)
-                            .coerceIn(0..text.lastIndex + unit.length)
+                    return if (showSymbol && rearSymbol.not()) {
+                        (offset - (commas - commasAtRight) - symbol.length)
+                            .coerceIn(0..text.lastIndex + symbol.length)
                     } else {
                         (offset - (commas - commasAtRight)).coerceIn(0..text.length)
                     }
@@ -200,19 +206,19 @@ class CurrencyVisualTransformation(
 
 fun visualText(
     amount: String,
-    showUnit: Boolean,
-    unit: String,
-    rearUnit: Boolean,
+    showSymbol: Boolean,
+    symbol: String,
+    rearSymbol: Boolean,
 ): String {
     val sb = StringBuilder()
-    if (showUnit && rearUnit.not()) {
-        sb.append(unit)
+    if (showSymbol && rearSymbol.not()) {
+        sb.append(symbol)
     }
     sb.append(
         amount.toFormattedNumberString()
     )
-    if (showUnit && rearUnit) {
-        sb.append(unit)
+    if (showSymbol && rearSymbol) {
+        sb.append(symbol)
     }
     return sb.toString()
 }
@@ -234,7 +240,7 @@ fun CurrencyFieldPreview() {
             }, onValueChanged = {
                 Log.d(MainActivity.TAG, "onValueChanged: $it")
             },
-            rearUnit = true,
+            rearSymbol = true,
             maxValue = BigDecimal("1000"),
             maxLength = 10
         )

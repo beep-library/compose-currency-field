@@ -3,7 +3,7 @@ package com.mangbaam.library
 import java.math.BigDecimal
 import java.text.NumberFormat
 
-val symbol
+val currencySymbol
     get() = NumberFormat.getCurrencyInstance().currency?.symbol ?: "원"
 
 /**
