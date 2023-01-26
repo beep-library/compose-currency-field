@@ -30,6 +30,39 @@ import androidx.compose.ui.unit.dp
 import com.mangbaam.library.ui.theme.CurrencyFieldTheme
 import java.math.BigDecimal
 
+@Composable
+fun CurrencyField(
+    modifier: Modifier = Modifier,
+    initAmount: Long = 0L,
+    maxValue: Long? = null,
+    maxLength: Int? = null,
+    onTextChanged: (String) -> Unit = {},
+    onValueChanged: (String) -> Unit = {},
+    showUnit: Boolean = true,
+    unit: String = "원",
+    rearUnit: Boolean = true,
+    textStyle: TextStyle = LocalTextStyle.current,
+    editable: Boolean = true,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+) {
+    CurrencyField(
+        modifier,
+        BigDecimal(initAmount),
+        maxValue?.let { BigDecimal(it) },
+        maxLength,
+        onTextChanged,
+        onValueChanged,
+        showUnit,
+        unit,
+        rearUnit,
+        textStyle,
+        editable,
+        enabled,
+        interactionSource
+    )
+}
+
 /**
  * @param initAmount initial displayed amount. if this value is larger than [maxValue] or longer than [maxLength], [CurrencyField] will display "0"
  * @param maxValue max value. if null or by default, it have no limit
