@@ -23,7 +23,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mangbaam.library.ui.theme.CurrencyFieldTheme
-import java.math.BigDecimal
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,19 +61,18 @@ fun MainScreen() {
                 .padding(16.dp)
                 .background(Color.LightGray)
                 .padding(30.dp),
-            initAmount = BigDecimal("300000"),
+            initAmount = 1000,
             textStyle = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.End),
             onTextChanged = {
                 Log.d(MainActivity.TAG, "onTextChanged: $it")
                 displayed = it
             }, onValueChanged = {
                 Log.d(MainActivity.TAG, "onValueChanged: $it")
-                amount = it
+                amount = it.toString()
             },
             rearUnit = true,
-            unit = "WON",
-            maxValue = BigDecimal("9990"),
-            maxLength = 4
+            maxValue = null,
+            maxLength = null
         )
     }
 }

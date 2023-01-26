@@ -30,6 +30,20 @@ import androidx.compose.ui.unit.dp
 import com.mangbaam.library.ui.theme.CurrencyFieldTheme
 import java.math.BigDecimal
 
+/**
+ * @param initAmount initial displayed amount. if this value is larger than [maxValue] or longer than [maxLength], [CurrencyField] will display "0"
+ * @param maxValue max value. if null or by default, it have [Long]'s max value. This could not be larger than [Long]'s max value
+ * @param maxLength max length. if null or by default, it have [Long]'s max length - 1. This could not be longer than [Long]'s max length - 1
+ * @param onTextChanged callback of displayed text
+ * @param onValueChanged callback of currency value
+ * @param showUnit show currency unit or not
+ * @param unit currency unit. It will obey current locale's currency unit for default
+ * @param rearUnit display unit to end of currency if true else start of currency
+ * @param textStyle text style for displayed text
+ * @param editable controls the editable state of the [CurrencyField]. When false, the text field can not be modified, however, a user can focus it and copy text from it. Read-only text fields are usually used to display pre-filled forms that user can not edit
+ * @param enabled controls the enabled state of the [CurrencyField]. When false, the text field will be neither editable nor focusable, the input of the text field will not be selectable
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s for this TextField. You can create and pass in your own remembered [MutableInteractionSource] if you want to observe [Interaction]s and customize the appearance / behavior of this TextField in different [Interaction]s.
+ */
 @Composable
 fun CurrencyField(
     modifier: Modifier = Modifier,
@@ -37,7 +51,7 @@ fun CurrencyField(
     maxValue: Long? = null,
     maxLength: Int? = null,
     onTextChanged: (String) -> Unit = {},
-    onValueChanged: (String) -> Unit = {},
+    onValueChanged: (Long) -> Unit = {},
     showUnit: Boolean = true,
     unit: String = "원",
     rearUnit: Boolean = true,
@@ -46,13 +60,17 @@ fun CurrencyField(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
+    val bigDecimalOnValueChangedHandler = { value: BigDecimal ->
+        onValueChanged(value.toLong())
+    }
+    val maxLengthOfLong = Long.MAX_VALUE.toString().length
     CurrencyField(
         modifier,
         BigDecimal(initAmount),
-        maxValue?.let { BigDecimal(it) },
-        maxLength,
+        maxValue?.let { BigDecimal(minOf(it, Long.MAX_VALUE)) } ?: BigDecimal(Long.MAX_VALUE),
+        maxLength?.let { minOf(it, maxLengthOfLong - 1) } ?: (maxLengthOfLong - 1),
         onTextChanged,
-        onValueChanged,
+        bigDecimalOnValueChangedHandler,
         showUnit,
         unit,
         rearUnit,
@@ -84,7 +102,7 @@ fun CurrencyField(
     maxValue: BigDecimal? = null,
     maxLength: Int? = null,
     onTextChanged: (String) -> Unit = {},
-    onValueChanged: (String) -> Unit = {},
+    onValueChanged: (BigDecimal) -> Unit = {},
     showUnit: Boolean = true,
     unit: String = "원",
     rearUnit: Boolean = true,
@@ -118,7 +136,7 @@ fun CurrencyField(
                 if (inputText > max) return@BasicTextField
             }
             amount = inputText.toString()
-            onValueChanged(amount.toNumberStringOrDefault("0"))
+            onValueChanged(BigDecimal(amount.toNumberStringOrDefault("0")))
             onTextChanged(visualText(amount, showUnit, unit, rearUnit))
         },
         visualTransformation = CurrencyVisualTransformation(unit, showUnit, rearUnit),
